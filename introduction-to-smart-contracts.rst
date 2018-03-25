@@ -379,7 +379,7 @@ likely it will be.
 以太坊虚拟机
 ****************************
 
-Overview
+Overview 概览
 ========
 
 The Ethereum Virtual Machine or EVM is the runtime environment
@@ -388,9 +388,13 @@ actually completely isolated, which means that code running
 inside the EVM has no access to network, filesystem or other processes.
 Smart contracts even have limited access to other smart contracts.
 
+Ethereum虚拟机(EVM)是 Ethereum中智能合约的运行环境. 它不仅仅是沙盒状态的, 并且完全
+独立, 意味着EVM中代码运行没有权利访问网络, 文件系统或者其他程序. 智能合约甚至访问其他
+合约的权限也是受到限制的.
+
 .. index:: ! account, address, storage, balance
 
-Accounts
+Accounts 账号
 ========
 
 There are two kinds of accounts in Ethereum which share the same
@@ -398,33 +402,48 @@ address space: **External accounts** that are controlled by
 public-private key pairs (i.e. humans) and **contract accounts** which are
 controlled by the code stored together with the account.
 
+Ethereum 账号有两种, 但是共享相同的数据空间. 使用公私钥密钥对控制的**外部账户**,
+还有被账户中所有智能合约代码控制的**合约账户**.
+
 The address of an external account is determined from
 the public key while the address of a contract is
 determined at the time the contract is created
 (it is derived from the creator address and the number
 of transactions sent from that address, the so-called "nonce").
 
+外部账户地址取决于公钥, 而合约账户地址取决于合约创建时间(受外部账户地址和合约所在区块(nonce)共同驱动).
+
 Regardless of whether or not the account stores code, the two types are
 treated equally by the EVM.
 
+不管账户是否存储了代码, 两种账户都被 EVM 同等的对待.
+
 Every account has a persistent key-value store mapping 256-bit words to 256-bit
 words called **storage**.
+
+每个账户有一个持久化的键值对, 存储 256位-256位 的哈希数据, 成为存储.
 
 Furthermore, every account has a **balance** in
 Ether (in "Wei" to be exact) which can be modified by sending transactions that
 include Ether.
 
+此外, 每个账户有一个 **余额**, 以 Ether(准确的说是以Wei)为单位, 通过发生含有Ether的交易可以更改余额.
+
 .. index:: ! transaction
 
-Transactions
-============
+Transactions 交易
+================
 
 A transaction is a message that is sent from one account to another
 account (which might be the same or the special zero-account, see below).
 It can include binary data (its payload) and Ether.
 
+交易是一个账户发给另一个账户的消息(可能是相同账户或者空账户, 详情继续阅读). 可以包含二进制数据(称为payload)和Ether.
+
 If the target account contains code, that code is executed and
 the payload is provided as input data.
+
+如果目标账号含有代码, 那么数据将作为输入数据传入代码.
 
 If the target account is the zero-account (the account with the
 address ``0``), the transaction creates a **new contract**.
@@ -438,6 +457,11 @@ This means that in order to create a contract, you do not
 send the actual code of the contract, but in fact code that
 returns that code.
 
+如果目标是一个空账户(地址为0), 交易创建一个 **新的合约**. 就像刚刚提到的, 该新合约的地址并非0,
+而是使用发起者信息和交易所在区块nonce自动生成. 这样的创建新合约的交易的二进制数据, 将传入到EVM中
+作为二进制代码存储执行. 输出内容将永久的作为合约代码存储起来. 这意味着创建合约时并非将合约代码直接
+发送过去, 而是发送一个返回该合约的函数的代码.
+
 .. index:: ! gas, ! gas price
 
 Gas
@@ -448,17 +472,25 @@ whose purpose is to limit the amount of work that is needed to execute
 the transaction and to pay for this execution. While the EVM executes the
 transaction, the gas is gradually depleted according to specific rules.
 
+每个交易运行的时候, 都会收取一部分费用, 称为 **gas**, 目的是限制需要执行的交易的工作量, 并且为工作量付费.
+EVM执行交易时, gas将根据相应规则逐步消耗.
+
 The **gas price** is a value set by the creator of the transaction, who
 has to pay ``gas_price * gas`` up front from the sending account.
 If some gas is left after the execution, it is refunded in the same way.
+
+**gas 价格**是一个交易发起人创建交易时设置的值, 发起人将支付 ``gas价格 * gas消耗量`` 数量的费用.
+如果交易后有 gas 剩余, 将退还给交易发起人.
 
 If the gas is used up at any point (i.e. it is negative),
 an out-of-gas exception is triggered, which reverts all modifications
 made to the state in the current call frame.
 
+如果 gas 在执行结束前用光了(变为负数), 将会触发 out-of-gas 错误, 回滚本次执行对状态变量的所有修改.
+
 .. index:: ! storage, ! memory, ! stack
 
-Storage, Memory and the Stack
+Storage, Memory and the Stack 存储, 内存 和 堆栈
 =============================
 
 Each account has a persistent memory area which is called **storage**.
@@ -468,6 +500,9 @@ and it is comparatively costly to read and even more so, to modify
 storage. A contract can neither read nor write to any storage apart
 from its own.
 
+每个账户都有一个持久化内存区域, 称为 **storage存储区**. 存储区是一个256位-256位的哈希键值对.
+存储区是不可枚举的, 读写起来相当的耗费资源. 合约智能读取属于自己账户的存储区.
+
 The second memory area is called **memory**, of which a contract obtains
 a freshly cleared instance for each message call. Memory is linear and can be
 addressed at byte level, but reads are limited to a width of 256 bits, while writes
@@ -475,6 +510,12 @@ can be either 8 bits or 256 bits wide. Memory is expanded by a word (256-bit), w
 accessing (either reading or writing) a previously untouched memory word (ie. any offset
 within a word). At the time of expansion, the cost in gas must be paid. Memory is more
 costly the larger it grows (it scales quadratically).
+
+第二块内存区域称为 **memory内存区**, 用于合约在处理每条消息时获取最新的消息实例. 内存区是线性结构,
+并且允许以字节级别访问, 但是每次最大读取不允许超过 256位, 写入则可以以 8位/256位进行. 内存区当大小
+以 256位进行扩容, when accessing (either reading or writing) a previously
+untouched memory word (ie. any offset within a word). 扩容的时候是需要收取 gas 的, 内存区
+的gas价格随着内存占用的增大而加大(1斤1块钱, 2斤3块钱, 3斤8块钱..., 第1斤1块钱, 第2斤2块钱, 第3斤5块钱...)
 
 The EVM is not a register machine but a stack machine, so all
 computations are performed on an area called the **stack**. It has a maximum size of
@@ -488,6 +529,12 @@ the operation) elements from the stack and push the result onto the stack.
 Of course it is possible to move stack elements to storage or memory,
 but it is not possible to just access arbitrary elements deeper in the stack
 without first removing the top of the stack.
+
+EVM 不是基于寄存器的而是基于堆栈的. 所以计算都是基于 **stack堆栈区** 进行的. 最大上限为 1024 个元素 and contains words of 256 bits.
+堆栈仅限于访问顶端, 访问方式为:
+允许将顶部16个元素之一拷贝到堆栈区最顶端, 或者将堆栈区最顶端的元素与其下面的16个元素之一进行换位.
+其余的操作运算都是取堆栈区最顶端的2个(或者1个,或者多个,这取决于进行什么运算)元素, 运算后将其结果放回堆栈最顶端.
+当然, 可以将堆栈区元素移动到存储区或者内存区, 但是决不允许不移除顶端元素的情况下, 直接访问堆栈区中更深层的元素.
 
 .. index:: ! instruction
 
