@@ -15,21 +15,33 @@ are not guaranteed to be working and despite best efforts they might contain und
 and/or broken changes. We recommend using the latest release. Package installers below
 will use the latest release.
 
-Remix
+Solidity 版本号遵循 `semantic 版本规则 <https://semver.org>`_ . 也会提供**每日编译版本**. 每日编译版本
+不保证能正常运行, 尽管努力维护也不能保证不包含文档没有说明的部分, 或者不兼容的更新. 我们建议使用最新的稳定版.
+使用下面列举的方法来安装最新稳定版本.
+
+Remix 方式安装
 =====
 
 *We recommend Remix for small contracts and for quickly learning Solidity.*
+
+*我们推荐Remix方式作为简单合约开发, 或者快速开始学习Solidity时使用.*
 
 `Access Remix online <https://remix.ethereum.org/>`_, you don't need to install anything.
 If you want to use it without connection to the Internet, go to
 https://github.com/ethereum/browser-solidity/tree/gh-pages and download the .ZIP file as
 explained on that page.
 
+`访问Remix在线编辑器 <https://remix.ethereum.org/>`_, 无需本地安装任何软件. 如果你想离线使用,
+到 https://github.com/ethereum/browser-solidity/tree/gh-pages 下载 ZIP 包.
+
 Further options on this page detail installing commandline Solidity compiler software
 on your computer. Choose a commandline compiler if you are working on a larger contract
 or if you require more compilation options.
 
-npm / Node.js
+本页其他额外的选项都是在本地安装Solidity的方案. 如果你在进行一个大的合约项目或者需要其他编译选项,
+那么选择一个命令行编译器.
+
+使用 Node.js(npm) 安装
 =============
 
 Use `npm` for a convenient and portable way to install `solcjs`, a Solidity compiler. The
@@ -38,9 +50,16 @@ Use `npm` for a convenient and portable way to install `solcjs`, a Solidity comp
 the full-featured compiler, `solc`. So if you install `solcjs` from `npm` then you will
 stop reading the documentation here and then continue to <https://github.com/ethereum/solc-js>,
 
+使用 `npm` 作为一个方便便携的方式来安装Solidity编译器 `solcjs`. `solcjs`并非拥有全部的命令行选项, 我们
+`选择编译器 <using-the-compiler.html>` 一章强烈建议使用全部功能版本编译器 `solc`. 所以如果你是使用 `npm`
+方式来安装的 `solcjs`, 那么就需要跳过本页剩余部分, 去 <https://github.com/ethereum/solc-js> 继续.
+
 Note: The `solc-js <https://github.com/ethereum/solc-js>` project is derived from the C++
 `solc` by using Emscripten. `solc-js` can be used in JavaScript projects directly (such as Remix).
 Please refer to the `solc-js <https://github.com/ethereum/solc-js>`_ repository for instructions.
+
+注意: 文档 `solc-js <https://github.com/ethereum/solc-js>` 是使用 Emscripten 对 c++ 版本的 `solc` 的封装.
+`solc-js`可以直接在 JS 工程(例如Remix)中进行使用. 详细介绍参考 `solc-js <https://github.com/ethereum/solc-js>`_.
 
 .. code:: bash
 
@@ -50,8 +69,12 @@ Please refer to the `solc-js <https://github.com/ethereum/solc-js>`_ repository 
 
     The commandline is named `solcjs`.
 
+    安装后命令不是solc, 而是 solcjs.
+
     The comandline options of `solcjs` are not compatible with `solc` and tools (such as `geth`)
     expecting the behaviour of `solc` will not work with `solcjs`.
+
+    `solcjs` 命令行参数与 `solc` 和工具(例如`geth`) 并非完全相同. 在 `solc` 下运行的程序也许在 `solcjs` 下并不能完美运行.
 
 Docker
 ======
@@ -68,7 +91,7 @@ Currently, the docker image only contains the compiler executable,
 so you have to do some additional work to link in the source and
 output directories.
 
-二进制包
+二进制包安装
 ===============
 
 Binary packages of Solidity are available at
@@ -186,6 +209,11 @@ If you are installing Xcode for the first time, or have just installed a new
 version then you will need to agree to the license before you can do
 command-line builds:
 
+在 MacOS 系统下, 确保已经安装了最新版本的 `Xcode <https://developer.apple.com/xcode/download/>`_.
+Xcode 中包含了 `C语言 C++ 编译器 <https://en.wikipedia.org/wiki/Clang>`_,
+`Xcode IDE <https://en.wikipedia.org/wiki/Xcode>`_ 和其他苹果系统下C++的开发环境.
+如果你是首次安装 Xcode, 或者刚刚新安装, 那么在你使用命令行之前, 你需要同意相应 license:
+
 .. code:: bash
 
     sudo xcodebuild -license accept
@@ -195,6 +223,10 @@ package manager for installing external dependencies.
 Here's how to `uninstall Homebrew
 <https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/FAQ.md#how-do-i-uninstall-homebrew>`_,
 if you ever want to start again from scratch.
+
+我们的OS X版本需要使用 `Homebrew <http://brew.sh>`_ 包管理工具来安装.
+如果想从头开始, 那么可以先卸载 `Homebrew
+<https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/FAQ.md#how-do-i-uninstall-homebrew>`_.
 
 
 Prerequisites - Windows

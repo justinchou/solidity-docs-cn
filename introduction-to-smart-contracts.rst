@@ -11,7 +11,9 @@
 Let us begin with the most basic example. It is fine if you do not understand everything
 right now, we will go into more detail later.
 
-Storage
+我们开始以一个简单的例子入手了解智能合约. 现在看不懂没关系, 我们将一步步带你深入.
+
+Storage 存储
 =======
 
 ::
@@ -33,9 +35,14 @@ Storage
 The first line simply tells that the source code is written for
 Solidity version 0.4.0 or anything newer that does not break functionality
 (up to, but not including, version 0.5.0). This is to ensure that the
-contract does not suddenly behave differently with a new compiler version. The keyword ``pragma`` is called that way because, in general,
+contract does not suddenly behave differently with a new compiler version.
+The keyword ``pragma`` is called that way because, in general,
 pragmas are instructions for the compiler about how to treat the
 source code (e.g. `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).
+
+第一行表明代码是基于 Solidity 0.4.0 或者更高版本(小于0.5.0). 这是为了保证程序不会在新的编译器下运行异常.
+关键词 ``pragma`` 用于标记版本, 是因为一般情况 pragmas 是给编译器如何编译的标记.
+(例如 `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).
 
 A contract in the sense of Solidity is a collection of code (its *functions*) and
 data (its *state*) that resides at a specific address on the Ethereum
@@ -46,8 +53,15 @@ code that manages the database. In the case of Ethereum, this is always the owni
 contract. And in this case, the functions ``set`` and ``get`` can be used to modify
 or retrieve the value of the variable.
 
+在 Solidity 看来, 一个合约就是一些代码(*function*)和数据状态(*state*)的集合, 并且以指定地址存储在 Ethereum 区块链中.
+``uint storedData;`` 声明一个名为storedData的状态(state)变量, 是 ``uint``(无符号整型,256位)的. 可以将其理解为一个
+数据库中的单个slot存储, 可以通过代码中定义的查询修改来管理该数据. In the case of Ethereum, this is always the owning
+contract. 这种情况下``set`` 和 ``get`` 方法将被用于更改或恢复变量的值.
+
 To access a state variable, you do not need the prefix ``this.`` as is common in
 other languages.
+
+想要获取变量的状态, 无需像其他语言一样使用 ``this.``.
 
 This contract does not do much yet (due to the infrastructure
 built by Ethereum) apart from allowing anyone to store a single number that is accessible by
@@ -57,18 +71,25 @@ and overwrite your number, but the number will still be stored in the history
 of the blockchain. Later, we will see how you can impose access restrictions
 so that only you can alter the number.
 
+(翻译不太好...)这个合约现在还很简单, 所有人都可以通过 ``set`` 设置数据覆盖原有值, 但是历史记录仍存在. 稍后
+我们将展示一下如何提高权限管理, 以便只有你可以更改该数据.
+
 .. note::
     All identifiers (contract names, function names and variable names) are restricted to
     the ASCII character set. It is possible to store UTF-8 encoded data in string variables.
+
+    所有标识符(合约名,方法名,变量名)都是ASCII受限的. 可以通过string存储 UTF-8 数据.
 
 .. warning::
     Be careful with using Unicode text as similarly looking (or even identical) characters can
     have different code points and as such will be encoded as a different byte array.
 
+    注意使用 Unicode 文本编码的字符或者文字, 尽管外表看似相同或者相等, 也会引起代码编译成完全不同的二进制数组.
+
 .. index:: ! subcurrency
 
-Subcurrency Example
-===================
+自定义货币举例
+===============
 
 The following contract will implement the simplest form of a
 cryptocurrency. It is possible to generate coins out of thin air, but
@@ -77,6 +98,8 @@ to implement a different issuance scheme).
 Furthermore, anyone can send coins to each other without any need for
 registering with username and password - all you need is an Ethereum keypair.
 
+下面的合约将实现最简单的加密货币. 可以凭空生成货币, 但是只有合约的创建者有该权限.
+货币发行细节这里做极简化. 此外, 任何人都可以无需账号密码的向其他账号转账, 只需Ethereum私钥.
 
 ::
 
