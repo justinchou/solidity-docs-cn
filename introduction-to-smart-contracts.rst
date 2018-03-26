@@ -549,6 +549,10 @@ Conditional and unconditional jumps are possible. Furthermore,
 contracts can access relevant properties of the current block
 like its number and timestamp.
 
+上面只是简单的介绍EVM. 全部都是基于基础数据类型 256位 进行的.
+常用的算数运算, bit, 逻辑和比较运算也支持, 同样支持条件跳转等. 此外, 合约也可以
+访问当前区块的相关属性, 例如 number 和时间戳.
+
 .. index:: ! message call, function;call
 
 Message Calls
@@ -560,6 +564,10 @@ to transactions, in that they have a source, a target, data payload,
 Ether, gas and return data. In fact, every transaction consists of
 a top-level message call which in turn can create further message calls.
 
+合约可以调用其他合约, 或者通过消息传递的方式向非合约账户转账. 消息传递与交易类似,
+因为都是有来源, 目标, 传递的数据, Ether, gas 和返回值的. 实际上, 每个交易是由高级
+的消息传递组成的, 该消息结果反过来可以创建新的消息传递.
+
 A contract can decide how much of its remaining **gas** should be sent
 with the inner message call and how much it wants to retain.
 If an out-of-gas exception happens in the inner call (or any
@@ -568,14 +576,25 @@ In this case, only the gas sent together with the call is used up.
 In Solidity, the calling contract causes a manual exception by default in
 such situations, so that exceptions "bubble up" the call stack.
 
+合约可以设置内部消息调用消耗多少 gas, 保留多少gas. 如果 out-of-gas 错误(或者其他任意类型错误)
+在内部调用的时候被触发, 将以error错误的形式结果存到堆栈中.
+这种情况下, 只有发送调用的gas会被消耗, 运行过程中的gas不会消耗.
+Solidity中, 这种情况下, 调用合约默认触发一个手动的错误, 以便错误返回调用栈.
+
 As already said, the called contract (which can be the same as the caller)
 will receive a freshly cleared instance of memory and has access to the
 call payload - which will be provided in a separate area called the **calldata**.
 After it has finished execution, it can return data which will be stored at
 a location in the caller's memory preallocated by the caller.
 
+被调用的合约(可以和调用合约相同)将受到一个全新的内存区实例, 有权访问传递的数据,
+该数据存储在单独的区域, 名为 **calldata**. 在执行之后, 将返回数据存储在调用者
+(在调用者内存区)预先分配好的内存地址中.
+
 Calls are **limited** to a depth of 1024, which means that for more complex
 operations, loops should be preferred over recursive calls.
+
+调用深度最大限制为1024, 这意味着对于复杂的操作, 循环优于递归调用.
 
 .. index:: delegatecall, callcode, library
 
@@ -587,18 +606,25 @@ which is identical to a message call apart from the fact that
 the code at the target address is executed in the context of the calling
 contract and ``msg.sender`` and ``msg.value`` do not change their values.
 
+存在一个特殊的消息调用方法, 称为 **delegatecall** 方法.
+除了目标地址指定的代码将使用调用来源合约的上下文, ``msg.sender`` 和 ``msg.value`` 将保持原有值之外, 与普通方法没什么不同.
+
 This means that a contract can dynamically load code from a different
 address at runtime. Storage, current address and balance still
 refer to the calling contract, only the code is taken from the called address.
+
+这意味着合约可以动态从不同地址调用代码执行. 存储区, 当前地址, 余额等均使用调用来源的合约, 只有代码来自于被调用地址.
 
 This makes it possible to implement the "library" feature in Solidity:
 Reusable library code that can be applied to a contract's storage, e.g. in
 order to  implement a complex data structure.
 
+这就使得 "库" 功能得以实现. 可复用库代码, 例如在需要实现复杂数据结构的时候, 可以应用到合约的存储区.
+
 .. index:: log
 
-Logs
-====
+Logs 日志
+=========
 
 It is possible to store data in a specially indexed data structure
 that maps all the way up to the block level. This feature called **logs**
@@ -610,10 +636,15 @@ possible to search for this data in an efficient and cryptographically
 secure way, so network peers that do not download the whole blockchain
 ("light clients") can still find these logs.
 
+支持以特殊的检索数据结构存储数据, 以便将数据追溯到区块级别. 这个功能称为 **logs日志**
+在Solidity中用来实现 **events事件** 功能. 在log创建后, 合约是无法访问其中数据的,
+但是可以方便的在区块链外部进行访问. 因为一部分 log 数据存储在 `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_ 中,
+使得检索这些数据非常方便和安全, 也方便了极简版客户端(无需下载全部数据的端), 也可以查询这些内容.
+
 .. index:: contract creation
 
-Create
-======
+Create 构建
+===========
 
 Contracts can even create other contracts using a special opcode (i.e.
 they do not simply call the zero address). The only difference between
@@ -621,21 +652,30 @@ these **create calls** and normal message calls is that the payload data is
 executed and the result stored as code and the caller / creator
 receives the address of the new contract on the stack.
 
+合约中可以通过特殊的 opcode 来创建其他合约(而不是直接与0地址交易). 这种创建合约的方式与直接通过消息
+创建的不同是传递的数据将被执行, 然后结果以代码形式存储起来, 父合约调用者/合约创建者将获得新合约创建后存储于堆栈区的地址.
+
 .. index:: selfdestruct
 
-Self-destruct
-=============
+Self-destruct 自毁
+==================
 
 The only possibility that code is removed from the blockchain is
 when a contract at that address performs the ``selfdestruct`` operation.
 The remaining Ether stored at that address is sent to a designated
 target and then the storage and code is removed from the state.
 
+唯一能将合约代码从区块链中移除的方法是调用(合约的?还是该地址的?) ``selfdestruct`` 方法.
+账户中剩余的 Ether 将转移到设计好的目标中, 最后存储区和代码区从当前状态中移除.
+
 .. warning:: Even if a contract's code does not contain a call to ``selfdestruct``,
   it can still perform that operation using ``delegatecall`` or ``callcode``.
+  尽管合约代码并不包含 ``selfdestruct`` 的调用, 也可以使用 ``delegatecall`` 或 ``callcode`` 执行相同功能.
 
 .. note:: The pruning of old contracts may or may not be implemented by Ethereum
   clients. Additionally, archive nodes could choose to keep the contract storage
   and code indefinitely.
+  老版本合约可能没有实现 Ethereum 客户端. 此外不能确定存档节点选择保留合约的存储区和代码.
 
 .. note:: Currently **external accounts** cannot be removed from the state.
+  当前外部账户不允许宠状态中删除.
