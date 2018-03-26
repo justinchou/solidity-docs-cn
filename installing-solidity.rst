@@ -20,7 +20,7 @@ Solidity 版本号遵循 `semantic 版本规则 <https://semver.org>`_ . 也会�
 使用下面列举的方法来安装最新稳定版本.
 
 Remix 方式安装
-=====
+================
 
 *We recommend Remix for small contracts and for quickly learning Solidity.*
 
@@ -42,7 +42,7 @@ or if you require more compilation options.
 那么选择一个命令行编译器.
 
 使用 Node.js(npm) 安装
-=============
+=========================
 
 Use `npm` for a convenient and portable way to install `solcjs`, a Solidity compiler. The
 `solcjs` program has less features than all options further down this page. Our 
@@ -171,7 +171,7 @@ Gentoo Linux also provides a solidity package that can be installed using ``emer
 .. _building-from-source:
 
 从源代码编译
-====================
+=============
 
 Clone the Repository
 --------------------
