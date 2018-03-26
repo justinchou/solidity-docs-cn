@@ -5,12 +5,14 @@ Solidity源代码文件结构
 Source files can contain an arbitrary number of contract definitions, include directives
 and pragma directives.
 
+源代码文件可以包含任意数量的合约定义, 包含指令和代码指令.
+
 .. index:: ! pragma, version
 
 .. _version_pragma:
 
-Version Pragma
-==============
+Version Pragma 使用 Pragma 来标记版本号
+========================================================
 
 Source files can (and should) be annotated with a so-called version pragma to reject
 being compiled with future compiler versions that might introduce incompatible
@@ -21,7 +23,15 @@ a good idea to read through the changelog at least for releases that contain
 breaking changes, those releases will always have versions of the form
 ``0.x.0`` or ``x.0.0``.
 
-The version pragma is used as follows::
+源代码首行应该包含版本号, 以防止未来版本编译器引入不兼容的更新. 我们将尽量控制不兼容性,
+尤其是在更改语义同时更改语法的情况, 但无法保证未来一直兼容. 所以尽量关注大版本号的变动.
+例如 ``0.x.0`` 或者 ``x.0.0``.
+
+The version pragma is used as follows,
+
+版本号定义语法如下,
+
+::
 
   pragma solidity ^0.4.0;
 
@@ -32,23 +42,33 @@ there will be no breaking changes until version ``0.5.0``, so we can always
 be sure that our code will compile the way we intended it to. We do not fix
 the exact version of the compiler, so that bugfix releases are still possible.
 
+使用此版本标记的代码, 将不会兼容 0.4.0 以前的编译器, 也不兼容 0.5.0 版本以后的编译器(^符号限制).
+这个规则默认在 ``0.5.0`` 版本以前不会做出极度的更改, 所有我们可以保证我们代码以我们的期望运行.
+我们并不指定确切的版本号, 以便更新小版本后仍可以运行.
+
 It is possible to specify much more complex rules for the compiler version,
 the expression follows those used by `npm <https://docs.npmjs.com/misc/semver>`_.
+
+可以定义更复杂的版本号规则, 表达式规则遵循 `npm <https://docs.npmjs.com/misc/semver>`_.
 
 .. index:: source file, ! import
 
 .. _import:
 
-Importing other Source Files
-============================
+Importing other Source Files 引入其他代码文件
+========================================================
 
-Syntax and Semantics
---------------------
+Syntax and Semantics 语法和语义
+-----------------------------------
 
 Solidity supports import statements that are very similar to those available in JavaScript
 (from ES6 on), although Solidity does not know the concept of a "default export".
 
+Solidity支持引入语句, 这与js-es6非常类似, 尽管Solidity并没有 "default export" 的概念.
+
 At a global level, you can use import statements of the following form:
+
+在全局变量等级, 你可以使用 import 语句, 例如:
 
 ::
 
@@ -57,11 +77,15 @@ At a global level, you can use import statements of the following form:
 This statement imports all global symbols from "filename" (and symbols imported there) into the
 current global scope (different than in ES6 but backwards-compatible for Solidity).
 
+这个语句引入filename文件中所有全局的(以及从其他文件引入到filename中的)符号到当前全局环境(这与 js-es6 有些许不同).
+
 ::
 
   import * as symbolName from "filename";
 
 ...creates a new global symbol ``symbolName`` whose members are all the global symbols from ``"filename"``.
+
+这样的引入方式给 ``"filename"`` 中引入的全局变量外部包装了一个命名空间, 称为 ``symbolName`` .
 
 ::
 
@@ -69,13 +93,19 @@ current global scope (different than in ES6 but backwards-compatible for Solidit
 
 ...creates new global symbols ``alias`` and ``symbol2`` which reference ``symbol1`` and ``symbol2`` from ``"filename"``, respectively.
 
+这与的引入方式将 ``"filename"`` 中的 ``symbol1`` 和 ``symbol2`` 引入, 但是 symbol1 要使用别名 ``alias`` .
+
 Another syntax is not part of ES6, but probably convenient:
+
+另一种语法并不是ES6的, 但是更方便 ( Python? )
 
 ::
 
   import "filename" as symbolName;
 
 which is equivalent to ``import * as symbolName from "filename";``.
+
+与 ``import * as symbolName from "filename";`` 完全相同.
 
 Paths
 -----
@@ -85,16 +115,24 @@ In the above, ``filename`` is always treated as a path with ``/`` as directory s
 it is not considered as the current or the parent directory.
 All path names are treated as absolute paths unless they start with the current ``.`` or the parent directory ``..``.
 
+上面的例子中, 文件名中包含的 ``/`` 都被当做文件夹处理, ``.`` 当做当前文件夹, ``..`` 当成上一级文件夹.
+当 ``.`` 或 ``..`` 后面不是 ``/`` 符号, 那么牛不当做文件夹处理, 而作为文件名的一部分, 例如 ``.env`` 是一个文件.
+所有文件路径除非以 ``.`` 或 ``..`` 开头, 都以绝对路径解析.
+
 To import a file ``x`` from the same directory as the current file, use ``import "./x" as x;``.
 If you use ``import "x" as x;`` instead, a different file could be referenced
 (in a global "include directory").
+
+从相同文件夹导入 ``x`` 文件, 必须使用 ``import "./x" as x;`` 形式. 如果使用 ``import "x" as x;`` 则可能会引入完全错误的文件.
 
 It depends on the compiler (see below) how to actually resolve the paths.
 In general, the directory hierarchy does not need to strictly map onto your local
 filesystem, it can also map to resources discovered via e.g. ipfs, http or git.
 
-Use in Actual Compilers
------------------------
+编译器具体如何解析路径要依照情况而定, 一般除了支持本地文件路径外, 还指出资源发现, 基于 ipfs, http 或 git 等方式.
+
+Use in Actual Compilers 使用编译器
+----------------------------------------------
 
 When the compiler is invoked, it is not only possible to specify how to
 discover the first element of a path, but it is possible to specify path prefix
@@ -166,18 +204,27 @@ Other source code providers may be added in the future.
 
 .. index:: ! comment, natspec
 
-Comments
-========
+Comments 注释
+=================
 
 Single-line comments (``//``) and multi-line comments (``/*...*/``) are possible.
+
+单行注释 ``//`` 与 多行注释 ``/*..*/``.
 
 ::
 
   // This is a single-line comment.
 
+  // 单行注释
+
   /*
   This is a
   multi-line comment.
+  */
+
+  /*
+  多行
+  注释
   */
 
 
@@ -190,20 +237,26 @@ functions, annotate conditions for formal verification, and provide a
 **confirmation text** which is shown to users when they attempt to invoke a
 function.
 
+此外有另一种注释, 单行 ``///`` , 多行 ``/**..*/`` . 必须直接在函数定义或者语句上方使用.
+这一的注释可以使用 `Doxygen <https://en.wikipedia.org/wiki/Doxygen>`_ 语法来书写标签,
+之后可以自动生成文档.
+
 In the following example we document the title of the contract, the explanation
 for the two input parameters and two returned values.
+
+下面我们给一个合约书写了注释, 该方法有两个输入参数和两个返回值.
 
 ::
 
     pragma solidity ^0.4.0;
 
-    /** @title Shape calculator. */
+    /** @title 标题, Shape calculator. */
     contract shapeCalculator {
-        /** @dev Calculates a rectangle's surface and perimeter.
-          * @param w Width of the rectangle.
-          * @param h Height of the rectangle.
-          * @return s The calculated surface.
-          * @return p The calculated perimeter.
+        /** @dev 计算矩形面积和周长 Calculates a rectangle's surface and perimeter.
+          * @param w 矩形宽 Width of the rectangle.
+          * @param h 矩形高 Height of the rectangle.
+          * @return s 面积 The calculated surface.
+          * @return p 周长 The calculated perimeter.
           */
         function rectangle(uint w, uint h) returns (uint s, uint p) {
             s = w * h;
